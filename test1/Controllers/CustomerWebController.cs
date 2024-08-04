@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -169,7 +171,7 @@ namespace test1.Controllers
         }
 
         [HttpDelete("DeleteCustomer/{id}"), Authorize]
-        public IActionResult DeleteCustomer(int id)
+        public IActionResult DeleteCustomer([FromRoute] int id)
         {
             if (!_customerRepository.CustomerExists(id))
             {
@@ -189,7 +191,7 @@ namespace test1.Controllers
             
 
         }
-        [HttpPut("UpdateCustomer/{id}"), Authorize]
+        [HttpPut("UpdateCustomer"), Authorize]
         public ActionResult UpdateCustomer([FromBody] Customer updatedCustomer)
         {
             if (updatedCustomer == null || updatedCustomer.Id <= 0)
@@ -213,8 +215,35 @@ namespace test1.Controllers
             existingCustomer.MembershipTypeId = updatedCustomer.MembershipTypeId;
 
             _customerRepository.UpdateCustomer(existingCustomer);
+            _customerRepository.Save();
 
             return Ok(existingCustomer);
         }
+        /*[HttpPatch("EditCustomer"), Authorize]
+        public ActionResult EditCustomer(int id, JsonPatchDocument<Customer> patchDoc )
+        {
+            if (patchDoc == null)
+            {
+                return BadRequest();
+            }
+
+            var existingCustomer = _customerRepository.GetCustomerById(id);
+            if (existingCustomer == null)
+            {
+                return NotFound();
+            }
+            
+            patchDoc.ApplyTo(existingCustomer, ModelState);
+
+            
+
+
+
+
+            _customerRepository.EditCustomer(existingCustomer);
+            _customerRepository.Save();
+
+            return Ok(existingCustomer);
+        }*/
     }
 }

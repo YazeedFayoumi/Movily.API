@@ -22,6 +22,7 @@ namespace test1.Interfaces
         Customer LoginCustomer(Customer customer);
         Customer Profile(Customer customer);
         void DeleteCustomer(Customer customer);
-        void UpdateCustomer(Customer customer); 
+        void UpdateCustomer(Customer customer);
+        void EditCustomer(Customer customer);
     }
 }
