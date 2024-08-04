@@ -20,6 +20,8 @@ namespace test1.Interfaces
         bool Save();   
 
         Customer LoginCustomer(Customer customer);
-       // string CreateToken(Customer customer);
+        Customer Profile(Customer customer);
+        void DeleteCustomer(Customer customer);
+        void UpdateCustomer(Customer customer); 
     }
 }

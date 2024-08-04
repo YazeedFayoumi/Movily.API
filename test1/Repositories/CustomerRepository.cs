@@ -20,11 +20,10 @@ namespace test1.Repositories
             var newCustomer = new Customer
 
             { 
-                Email=customer.Email,
-                Password=customer.Password,
-                Name= string.Empty,
-                MembershipTypeId= 0
-
+                Email = customer.Email,
+                Password = customer.Password,
+                Name = string.Empty,
+                MembershipTypeId = 0
             };
 
             _context.Customer.Add(newCustomer);
@@ -47,6 +46,16 @@ namespace test1.Repositories
         public Customer CustomerExistsByName(string name)
         {
             return _context.Customer.FirstOrDefault(c => c.Name == name);
+        }
+
+        public void DeleteCustomer(Customer customer)
+        {
+            if (customer == null)
+            {
+                throw new ArgumentNullException(nameof(customer));
+            }
+             _context.Customer.Remove(customer);
+
         }
 
         public Customer GetCustomerByEmail(string email)
@@ -74,10 +83,20 @@ namespace test1.Repositories
             return (customer);
         }
 
+        public Customer Profile(Customer customer)
+        {
+            return customer;
+        }
+
         public bool Save()
         {
             var saved = _context.SaveChanges();
             return saved >0 ? true : false;
+        }
+
+        public void UpdateCustomer(Customer customer)
+        {
+            
         }
     }
 }
