@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using test1.Data;
 using test1.Dto;
 using test1.Interfaces;
@@ -56,6 +57,11 @@ namespace test1.Repositories
             }
              _context.Customer.Remove(customer);
 
+        }
+
+        public void EditCustomer(Customer customer)
+        {
+            _context.Entry(customer).State = EntityState.Modified;
         }
 
         public Customer GetCustomerByEmail(string email)
