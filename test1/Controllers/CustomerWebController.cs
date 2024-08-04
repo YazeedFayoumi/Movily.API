@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -99,14 +100,26 @@ namespace test1.Controllers
             {
                 return BadRequest("Wrong password.");
             }
+            
             string token = CreateToken(customer);
-            return Ok(token);
-        } 
+            
+            
+            string loggedInEmail = customer.Email;
 
+            var response = new
+            {
+                Email = loggedInEmail,
+                Token = token
+            };
+
+            return Ok(response);
+            
+            
+        } 
         private string CreateToken(Customer customer)
         {
             List<Claim> claims = new List<Claim> {
-                new Claim(ClaimTypes.Name, customer.Name)
+                new Claim(ClaimTypes.Email, customer.Email)
                 };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
@@ -124,6 +137,84 @@ namespace test1.Controllers
 
             return jwt;
         }
+        [HttpGet("Profile"), Authorize]
+        public ActionResult GetProfile()
+        {
+            
+            var emailClaim = User.FindFirst(ClaimTypes.Email);
+            if (emailClaim == null)
+            {
+                return Unauthorized("No email claim found.");
+            }
 
+            var email = emailClaim.Value;
+
+            
+            var customer = _customerRepository.GetCustomerByEmail(email);
+            if (customer == null)
+            {
+                return NotFound("Customer profile not found.");
+            }
+
+            
+            var profileResponse = new
+            {
+                customer.Name,
+                customer.Email,
+                customer.MembershipTypeId,
+                
+            };
+
+            return Ok(profileResponse);
+        }
+
+        [HttpDelete("DeleteCustomer/{id}"), Authorize]
+        public IActionResult DeleteCustomer(int id)
+        {
+            if (!_customerRepository.CustomerExists(id))
+            {
+                return NotFound("Customer not found.");
+            }
+
+            var customer = _customerRepository.GetCustomerById(id);
+            if (customer == null)
+            {
+                return NotFound("Customer not found.");
+            }
+
+            _customerRepository.DeleteCustomer(customer);
+            _customerRepository.Save();
+            return NoContent();
+
+            
+
+        }
+        [HttpPut("UpdateCustomer/{id}"), Authorize]
+        public ActionResult UpdateCustomer([FromBody] Customer updatedCustomer)
+        {
+            if (updatedCustomer == null || updatedCustomer.Id <= 0)
+            {
+                return BadRequest("Invalid customer data.");
+            }
+
+            var existingCustomer = _customerRepository.GetCustomerById(updatedCustomer.Id);
+            if (existingCustomer == null)
+            {
+                return NotFound("Customer not found.");
+            }
+
+            if (!string.IsNullOrEmpty(updatedCustomer.Password))
+            {
+                existingCustomer.Password = BCrypt.Net.BCrypt.HashPassword(updatedCustomer.Password);
+            }
+
+            existingCustomer.Name = updatedCustomer.Name;
+            existingCustomer.Email = updatedCustomer.Email;
+            existingCustomer.MembershipTypeId = updatedCustomer.MembershipTypeId;
+
+            _customerRepository.UpdateCustomer(existingCustomer);
+
+            return Ok(existingCustomer);
+        }
     }
 }
