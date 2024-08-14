@@ -28,7 +28,8 @@ namespace test1.Models
 
         [Required]
         public int Duration { get; set; }
-        public virtual ICollection<Customer> Customer { get; set; }
+        public string AddedByUser { get; set; }
+        public virtual ICollection<Customer> Customer { get; set; } = new List<Customer>();
         public virtual ICollection<Genre> Genre { get; set; }
     }
 }

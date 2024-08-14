@@ -6,7 +6,7 @@ namespace test1.Models
     public class Genre
     {
         [Key]
-       // [DatabaseGenerated(DatabaseGeneratedOption.Identity)]   
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]   
         public int GenreId { get; set; }
 
         [Required]

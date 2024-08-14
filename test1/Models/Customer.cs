@@ -23,10 +23,11 @@ namespace test1.Models
         [MinLength (8)]
         public string Password { get; set; }
 
-        //public virtual ICollection<Movie> Movie { get; set; }
+        public virtual ICollection<Movie> Movie { get; set; } = new List<Movie>();
 
-        //public MembershipType MembershipType { get; set; }
+        public MembershipType MembershipType { get; set; }
         public int MembershipTypeId { get; set; }
+        
     }
 
 }

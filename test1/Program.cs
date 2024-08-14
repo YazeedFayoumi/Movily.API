@@ -7,11 +7,20 @@ using test1.Interfaces;
 using test1.Repositories;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using AutoMapper;
+using test1.Mapping;
+using Microsoft.Extensions.DependencyInjection;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddNewtonsoftJson();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling =
+                            Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -53,7 +62,8 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerRepository, Repository>();
+builder.Services.AddScoped<IMovieRepository, Repository>();
 
 builder.Services.AddDbContext<ClassContextDb>(options =>
 {
