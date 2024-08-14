@@ -1,4 +1,5 @@
-﻿using Azure;
+﻿using AutoMapper;
+using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -23,13 +24,15 @@ namespace test1.Controllers
     {
         public ICustomerRepository _customerRepository;
         private readonly IConfiguration _configuration;
+        public IMapper _mapper;
 
         //public static Customer customerObj = new Customer();
 
-        public CustomerWebController(ICustomerRepository customerRepository, IConfiguration configuration)
+        public CustomerWebController(ICustomerRepository customerRepository, IConfiguration configuration, IMapper mapper)
         {
             _customerRepository = customerRepository;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
         [HttpGet("{GetString}")]
@@ -38,17 +41,18 @@ namespace test1.Controllers
         {
             return "working";
         }
-        [HttpGet("GetCustomers"), Authorize]
+        [HttpGet("GetCustomers")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Customer>))]
         public IActionResult GetCustomers()
         {
             var customers = _customerRepository.GetCustomers();
-
+            
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            return Ok(customers);
+            var customerDtos = _mapper.Map<List<CustomerDto>>(customers);
+            return Ok(customerDtos);
         }
         [HttpGet("GetCustomerById/{id}")]
         public IActionResult GetCustomerById(int id)
@@ -65,7 +69,7 @@ namespace test1.Controllers
             return Ok(customer);
         }
         [HttpPost("CreateCustomer")]
-        public ActionResult<Customer> CreateCustomer([FromBody] CustomerDto customer)
+        public ActionResult<Customer> CreateCustomer([FromBody] CustomerDtoSignIn customer)
         {
             if (customer == null || !ModelState.IsValid)
             {
@@ -81,10 +85,7 @@ namespace test1.Controllers
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(customer.Password);
             
             customer.Password = hashedPassword;
-           /* customerObj.Password = hashedPassword;
-            customerObj.Email = customer.Email;
-            customerObj.Name = customer.Name;
-            customerObj.MembershipTypeId = customer.MembershipTypeId;*/
+           
             var createdCustomer = _customerRepository.CreateCustomer(customer);
 
             return Ok(createdCustomer);

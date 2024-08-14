@@ -22,6 +22,21 @@ namespace test1.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CustomerMovie", b =>
+                {
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CustomerId", "MovieId");
+
+                    b.HasIndex("MovieId");
+
+                    b.ToTable("CustomerMovie", (string)null);
+                });
+
             modelBuilder.Entity("GenreMovie", b =>
                 {
                     b.Property<int>("GenreId")
@@ -34,7 +49,7 @@ namespace test1.Migrations
 
                     b.HasIndex("MovieId");
 
-                    b.ToTable("GenreMovie");
+                    b.ToTable("GenreMovie", (string)null);
                 });
 
             modelBuilder.Entity("test1.Models.Customer", b =>
@@ -53,9 +68,6 @@ namespace test1.Migrations
                     b.Property<int>("MembershipTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("MovieId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(550)
@@ -68,9 +80,9 @@ namespace test1.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MovieId");
+                    b.HasIndex("MembershipTypeId");
 
-                    b.ToTable("Customer");
+                    b.ToTable("Customer", (string)null);
                 });
 
             modelBuilder.Entity("test1.Models.Genre", b =>
@@ -93,7 +105,7 @@ namespace test1.Migrations
 
                     b.HasKey("GenreId");
 
-                    b.ToTable("Genre");
+                    b.ToTable("Genre", (string)null);
                 });
 
             modelBuilder.Entity("test1.Models.MembershipType", b =>
@@ -117,7 +129,7 @@ namespace test1.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MembershipType");
+                    b.ToTable("MembershipType", (string)null);
                 });
 
             modelBuilder.Entity("test1.Models.Movie", b =>
@@ -127,6 +139,10 @@ namespace test1.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MovieId"));
+
+                    b.Property<string>("AddedByUser")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -149,7 +165,22 @@ namespace test1.Migrations
 
                     b.HasKey("MovieId");
 
-                    b.ToTable("Movie");
+                    b.ToTable("Movie", (string)null);
+                });
+
+            modelBuilder.Entity("CustomerMovie", b =>
+                {
+                    b.HasOne("test1.Models.Customer", null)
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("test1.Models.Movie", null)
+                        .WithMany()
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("GenreMovie", b =>
@@ -169,14 +200,13 @@ namespace test1.Migrations
 
             modelBuilder.Entity("test1.Models.Customer", b =>
                 {
-                    b.HasOne("test1.Models.Movie", null)
-                        .WithMany("Customer")
-                        .HasForeignKey("MovieId");
-                });
+                    b.HasOne("test1.Models.MembershipType", "MembershipType")
+                        .WithMany()
+                        .HasForeignKey("MembershipTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-            modelBuilder.Entity("test1.Models.Movie", b =>
-                {
-                    b.Navigation("Customer");
+                    b.Navigation("MembershipType");
                 });
 #pragma warning restore 612, 618
         }

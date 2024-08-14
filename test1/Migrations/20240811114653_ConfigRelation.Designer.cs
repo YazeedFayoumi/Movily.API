@@ -12,8 +12,8 @@ using test1.Data;
 namespace test1.Migrations
 {
     [DbContext(typeof(ClassContextDb))]
-    [Migration("20240728130208_AddMembershipTypeData")]
-    partial class AddMembershipTypeData
+    [Migration("20240811114653_ConfigRelation")]
+    partial class ConfigRelation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,7 +37,7 @@ namespace test1.Migrations
 
                     b.HasIndex("MovieId");
 
-                    b.ToTable("CustomerMovie");
+                    b.ToTable("CustomerMovie", (string)null);
                 });
 
             modelBuilder.Entity("GenreMovie", b =>
@@ -65,21 +65,21 @@ namespace test1.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)");
+                        .HasMaxLength(550)
+                        .HasColumnType("nvarchar(550)");
 
                     b.Property<int>("MembershipTypeId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(550)
+                        .HasColumnType("nvarchar(550)");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)");
+                        .HasMaxLength(550)
+                        .HasColumnType("nvarchar(550)");
 
                     b.HasKey("Id");
 
@@ -132,7 +132,7 @@ namespace test1.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MembershipTypes");
+                    b.ToTable("MembershipType");
                 });
 
             modelBuilder.Entity("test1.Models.Movie", b =>
@@ -142,6 +142,10 @@ namespace test1.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MovieId"));
+
+                    b.Property<string>("AddedByUser")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
                         .IsRequired()

@@ -5,7 +5,7 @@ namespace test1.Interfaces
 {
     public interface ICustomerRepository
     {
-        ICollection<Customer> GetCustomers();
+        ICollection <Customer> GetCustomers();
         Customer GetCustomerById(int id);
 
         Customer GetCustomerByName(string name);
@@ -16,7 +16,7 @@ namespace test1.Interfaces
         bool CustomerExistsByEmail(string email);
         Customer CustomerExistsByName(string name);
 
-        Customer CreateCustomer(CustomerDto customer);
+        Customer CreateCustomer(CustomerDtoSignIn customer);
         bool Save();   
 
         Customer LoginCustomer(Customer customer);

@@ -20,7 +20,11 @@ namespace test1.Data
 
             base.OnModelCreating(modelBuilder);
 
-           
+            modelBuilder.Entity<Customer>()
+             .HasMany(c => c.Movie)
+             .WithMany(m => m.Customer)
+             .UsingEntity(j => j.ToTable("CustomerMovie"));
+                
 
 
         }
