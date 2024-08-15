@@ -15,13 +15,11 @@ namespace test1.Controllers
     {
         public IMovieRepository _movieRepository;
         private readonly ICustomerRepository _customerRepository;
-        private IConfiguration _configuration;
         public IMapper _mapper;
 
-        public MovieWebController(IMovieRepository movieRepository, IConfiguration configuration, IMapper mapper, ICustomerRepository customerRepository)
+        public MovieWebController(IMovieRepository movieRepository, IMapper mapper, ICustomerRepository customerRepository)
         {
             _movieRepository = movieRepository;
-            _configuration = configuration;
             _mapper = mapper;
             _customerRepository = customerRepository;
         }
@@ -48,7 +46,7 @@ namespace test1.Controllers
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             Customer customerAdded = _customerRepository.GetCustomerByEmail(userEmail);
             Movie addedMovie = _movieRepository.AddMovie(movie, userEmail, customerAdded);
-            
+
             return Ok(addedMovie);
         }
 
@@ -62,7 +60,7 @@ namespace test1.Controllers
                 return BadRequest(ModelState);
             }
             var movieDtos = _mapper.Map<List<MovieDto>>(movies);
-            
+
             return Ok(movieDtos);
         }
 
@@ -79,7 +77,7 @@ namespace test1.Controllers
             }
 
             var movieDto = _mapper.Map<MovieDto>(movie);
-            
+
 
             return Ok(movieDto);
         }
@@ -97,6 +95,45 @@ namespace test1.Controllers
             var movieDtos = _mapper.Map<IEnumerable<MovieDto>>(movies);
             return Ok(movieDtos);
         }
+        [HttpPut("EditMovie")]
+        public ActionResult EditMovie([FromBody] MovieDto movie)
+        {
+            if (movie == null)
+            {
+                return BadRequest("Invalid data.");
+            }
 
+            var existingMovie = _movieRepository.GetMovieByTitle(movie.Title);
+            if (existingMovie == null)
+            {
+                return NotFound("Movie not found.");
+            }
+
+            Movie updatedMovie = _movieRepository.EditMovie(movie, existingMovie);
+           
+
+            
+           
+
+            return Ok(updatedMovie);
+        }
+        [HttpDelete("DeleteMovie/{title}"), Authorize]
+        public IActionResult DeleteMovie([FromRoute] string title)
+        {
+            if (!_movieRepository.CheckMovieByTitle(title))
+            {
+                return NotFound("Movie not found.");
+            }
+
+            Movie movie = _movieRepository.GetMovieByTitle(title);
+            if (movie == null)
+            {
+                return NotFound("Customer not found.");
+            }
+
+            bool movieDeleted = _movieRepository.DeleteMovieByTitle(movie);
+            return Ok(movieDeleted);
+
+        }
     }
 }

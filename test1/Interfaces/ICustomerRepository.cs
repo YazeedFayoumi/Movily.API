@@ -24,5 +24,6 @@ namespace test1.Interfaces
         void DeleteCustomer(Customer customer);
         void UpdateCustomer(Customer customer);
         void EditCustomer(Customer customer);
+        List<Role> AddRoleToCustomer(Customer customer, AddRoleToCustomerDto model);
     }
 }

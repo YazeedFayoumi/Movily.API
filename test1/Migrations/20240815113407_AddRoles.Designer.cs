@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using test1.Data;
 
@@ -11,9 +12,11 @@ using test1.Data;
 namespace test1.Migrations
 {
     [DbContext(typeof(ClassContextDb))]
-    partial class ClassContextDbModelSnapshot : ModelSnapshot
+    [Migration("20240815113407_AddRoles")]
+    partial class AddRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,21 +40,6 @@ namespace test1.Migrations
                     b.ToTable("CustomerMovie", (string)null);
                 });
 
-            modelBuilder.Entity("CustomerRole", b =>
-                {
-                    b.Property<int>("CustomersId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RolesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CustomersId", "RolesId");
-
-                    b.HasIndex("RolesId");
-
-                    b.ToTable("CustomerRole", (string)null);
-                });
-
             modelBuilder.Entity("GenreMovie", b =>
                 {
                     b.Property<int>("GenreId")
@@ -64,7 +52,7 @@ namespace test1.Migrations
 
                     b.HasIndex("MovieId");
 
-                    b.ToTable("GenreMovie", (string)null);
+                    b.ToTable("GenreMovie");
                 });
 
             modelBuilder.Entity("test1.Models.Customer", b =>
@@ -97,7 +85,7 @@ namespace test1.Migrations
 
                     b.HasIndex("MembershipTypeId");
 
-                    b.ToTable("Customer", (string)null);
+                    b.ToTable("Customer");
                 });
 
             modelBuilder.Entity("test1.Models.Genre", b =>
@@ -120,7 +108,7 @@ namespace test1.Migrations
 
                     b.HasKey("GenreId");
 
-                    b.ToTable("Genre", (string)null);
+                    b.ToTable("Genre");
                 });
 
             modelBuilder.Entity("test1.Models.MembershipType", b =>
@@ -144,7 +132,7 @@ namespace test1.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MembershipType", (string)null);
+                    b.ToTable("MembershipType");
                 });
 
             modelBuilder.Entity("test1.Models.Movie", b =>
@@ -180,7 +168,7 @@ namespace test1.Migrations
 
                     b.HasKey("MovieId");
 
-                    b.ToTable("Movie", (string)null);
+                    b.ToTable("Movie");
                 });
 
             modelBuilder.Entity("test1.Models.Role", b =>
@@ -197,7 +185,7 @@ namespace test1.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role", (string)null);
+                    b.ToTable("Role");
 
                     b.HasData(
                         new
@@ -233,21 +221,6 @@ namespace test1.Migrations
                     b.HasOne("test1.Models.Movie", null)
                         .WithMany()
                         .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("CustomerRole", b =>
-                {
-                    b.HasOne("test1.Models.Customer", null)
-                        .WithMany()
-                        .HasForeignKey("CustomersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("test1.Models.Role", null)
-                        .WithMany()
-                        .HasForeignKey("RolesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

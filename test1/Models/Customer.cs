@@ -6,6 +6,7 @@ namespace test1.Models
     [Table("Customer")]
     public class Customer
     {
+        [Key]   
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]   
         public int Id { get; set; }
 
@@ -24,6 +25,8 @@ namespace test1.Models
         public string Password { get; set; }
 
         public virtual ICollection<Movie> Movie { get; set; } = new List<Movie>();
+        public ICollection<Role> Roles { get; set; }
+
 
         public MembershipType MembershipType { get; set; }
         public int MembershipTypeId { get; set; }
