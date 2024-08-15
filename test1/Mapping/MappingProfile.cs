@@ -10,6 +10,7 @@ namespace test1.Mapping
         {
             CreateMap<Customer, CustomerDto>();
             CreateMap<Movie, MovieDto>();
+            CreateMap<Genre, GenreDto>();
         }
     }
 }

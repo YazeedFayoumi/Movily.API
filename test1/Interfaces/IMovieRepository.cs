@@ -13,6 +13,9 @@ namespace test1.Interfaces
         Movie GetMovieByTitle (string title);
 
         IEnumerable<Movie> GetMoviesByCustomerEmail(string email);
+        bool DeleteMovieByTitle(Movie movie);
+        Movie EditMovie(MovieDto movie, Movie existingMovie );
+       // Movie AddGenreToMovie(Movie movie, Genre genre);
 
     }
 }

@@ -64,6 +64,9 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<ICustomerRepository, Repository>();
 builder.Services.AddScoped<IMovieRepository, Repository>();
+builder.Services.AddScoped<IGenreRepository, Repository>();
+
+
 
 builder.Services.AddDbContext<ClassContextDb>(options =>
 {

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using test1.Data;
 
@@ -11,9 +12,11 @@ using test1.Data;
 namespace test1.Migrations
 {
     [DbContext(typeof(ClassContextDb))]
-    partial class ClassContextDbModelSnapshot : ModelSnapshot
+    [Migration("20240815113726_AddRoles2")]
+    partial class AddRoles2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,7 +52,7 @@ namespace test1.Migrations
 
                     b.HasIndex("RolesId");
 
-                    b.ToTable("CustomerRole", (string)null);
+                    b.ToTable("CustomerRole");
                 });
 
             modelBuilder.Entity("GenreMovie", b =>
@@ -64,7 +67,7 @@ namespace test1.Migrations
 
                     b.HasIndex("MovieId");
 
-                    b.ToTable("GenreMovie", (string)null);
+                    b.ToTable("GenreMovie");
                 });
 
             modelBuilder.Entity("test1.Models.Customer", b =>
@@ -97,7 +100,7 @@ namespace test1.Migrations
 
                     b.HasIndex("MembershipTypeId");
 
-                    b.ToTable("Customer", (string)null);
+                    b.ToTable("Customer");
                 });
 
             modelBuilder.Entity("test1.Models.Genre", b =>
@@ -120,7 +123,7 @@ namespace test1.Migrations
 
                     b.HasKey("GenreId");
 
-                    b.ToTable("Genre", (string)null);
+                    b.ToTable("Genre");
                 });
 
             modelBuilder.Entity("test1.Models.MembershipType", b =>
@@ -144,7 +147,7 @@ namespace test1.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MembershipType", (string)null);
+                    b.ToTable("MembershipType");
                 });
 
             modelBuilder.Entity("test1.Models.Movie", b =>
@@ -180,7 +183,7 @@ namespace test1.Migrations
 
                     b.HasKey("MovieId");
 
-                    b.ToTable("Movie", (string)null);
+                    b.ToTable("Movie");
                 });
 
             modelBuilder.Entity("test1.Models.Role", b =>
@@ -197,7 +200,7 @@ namespace test1.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role", (string)null);
+                    b.ToTable("Role");
 
                     b.HasData(
                         new

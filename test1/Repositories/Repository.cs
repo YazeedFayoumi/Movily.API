@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using test1.Data;
 using test1.Dto;
 using test1.Interfaces;
@@ -7,7 +8,7 @@ using test1.Models;
 
 namespace test1.Repositories
 {
-    public class Repository : ICustomerRepository , IMovieRepository
+    public class Repository : ICustomerRepository , IMovieRepository , IGenreRepository
     {
         private readonly ClassContextDb _context;
         public Repository(ClassContextDb context) 
@@ -88,7 +89,10 @@ namespace test1.Repositories
 
         public Customer GetCustomerByEmail(string email)
         {
-            return _context.Customer.FirstOrDefault(c => c.Email == email);
+            return _context.Customer
+                       .Include(c => c.Roles)
+                       .FirstOrDefault(c => c.Email == email);      // _context.Customer.FirstOrDefault(c => c.Email == email);
+
         }
 
         public Customer GetCustomerById(int id)
@@ -146,6 +150,163 @@ namespace test1.Repositories
         {
             return _context.Movie.Include(m => m.Customer).Where(m => m.AddedByUser == email).ToList();
 
+        }
+
+        public Genre AddGenre(GenreDto genre)
+        {
+            Genre newGenre = new Genre
+
+            {
+                GenreName = genre.GenreName,
+                Description = genre.Description,
+     
+            };
+
+
+            _context.Genre.Add(newGenre);
+            /*Movie emptyMovie = new Movie();
+            newGenre.Movie.Add(emptyMovie);*/
+            
+            Save();
+
+            return newGenre;
+        }
+
+        public bool CheckGenreByName(string genreName)
+        {
+            return _context.Genre.Any(g => g.GenreName == genreName);
+        }
+
+        public Genre GetGenreByName(string genreName)
+        {
+            // return _context.Genre.Where(p => p.GenreName == genreName).FirstOrDefault();
+            return _context.Genre
+         .Include(g => g.Movie)
+         .FirstOrDefault(g => g.GenreName == genreName);
+        }
+
+        public Genre AddMovieToGenre(Movie movie, Genre genre)
+        {
+            if (genre.Movie == null)
+            {
+                genre.Movie = new List<Movie>();
+            }
+            genre.Movie.Add(movie);
+            Save();
+            return genre;
+        }
+
+        public bool DeleteMovieByTitle(Movie movie)
+        {
+           bool wasDeleted;
+           string movieTitle = movie.Title;
+            _context.Movie.Remove(movie);
+            Save();
+            if (_context.Movie.Any(d => d.Title == movieTitle))
+            {
+                wasDeleted = false;
+            }
+            else
+            {
+                wasDeleted= true;
+            }
+            //Save();
+            return wasDeleted;
+        }
+
+        public Movie EditMovie(MovieDto movie, Movie existingMovie)
+        {
+            //Movie editedMovie = new Movie();
+            if (movie.Title != existingMovie.Title)
+            {
+                existingMovie.Title = movie.Title;
+            }
+           // else { editedMovie.Title = existingMovie.Title; }
+            if(movie.Description != existingMovie.Description)
+            {
+                existingMovie.Description = movie.Description;
+            }
+            //else { editedMovie.Description = editedMovie.Description; }
+
+            if (movie.ReleaseDate != existingMovie.ReleaseDate)
+            {
+                existingMovie.ReleaseDate = movie.ReleaseDate;
+            }
+           // else { editedMovie.ReleaseDate=existingMovie.ReleaseDate; }
+            if (movie.Duration != existingMovie.Duration)
+            {
+                existingMovie.Duration = movie.Duration;
+            }
+           // else
+            {
+                existingMovie.Duration = existingMovie.Duration;
+            }
+            if (movie.Rating != existingMovie.Rating)
+            {
+                existingMovie.Rating = movie.Rating;
+            }
+            // else { editedMovie.Rating = existingMovie.Rating; }
+            existingMovie.AddedByUser = existingMovie.AddedByUser;
+            _context.Movie.Update(existingMovie);
+            
+            Save();
+            return existingMovie;
+        }
+
+        public ICollection<Genre> GetAllGenres()
+        {
+            return _context.Genre.OrderBy(p => p.GenreId).ToList();
+        }
+
+        public ICollection<Movie> GetGenreMovies(Genre genre)
+        {
+            if (genre.Movie == null)
+            {
+                return new List<Movie>();
+            }
+
+            return genre.Movie.ToList();
+
+        }
+
+        public bool DeleteGenreByName(Genre genre)
+        {
+            bool wasDeleted;
+            string genreName = genre.GenreName;
+            _context.Genre.Remove(genre);
+            Save();
+            if (_context.Genre.Any(d => d.GenreName == genreName))
+            {
+                wasDeleted = false;
+            }
+            else
+            {
+                wasDeleted= true;
+            }
+           
+            return wasDeleted;
+        }
+
+        public List<Role> AddRoleToCustomer(Customer customer, AddRoleToCustomerDto model)
+        {
+            if (customer == null)
+            {
+                throw new Exception("Customer not found");
+            }
+            var roles = _context.Role.Where(r => model.Roles.Contains(r.Name)).ToList();
+
+            foreach (var role in roles)
+            {
+                if (!customer.Roles.Contains(role))
+                {
+                    customer.Roles.Add(role);
+
+                }
+            }
+            
+            Save();
+            List<Role> cusotmerRoles = customer.Roles.ToList();   
+            return cusotmerRoles;
         }
     }
 }

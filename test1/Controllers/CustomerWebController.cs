@@ -41,6 +41,7 @@ namespace test1.Controllers
         {
             return "working";
         }
+        [AuthorizeRole(Roles ="Admin")]
         [HttpGet("GetCustomers")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Customer>))]
         public IActionResult GetCustomers()
@@ -122,9 +123,13 @@ namespace test1.Controllers
         private string CreateToken(Customer customer)
         {
             List<Claim> claims = new List<Claim> {
-                new Claim(ClaimTypes.Email, customer.Email)
+                new Claim(ClaimTypes.Email, customer.Email),
+                //new Claim(ClaimTypes.Role, customer.Roles)
                 };
-
+            foreach (var role in customer.Roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role.Name)); 
+            }
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                 _configuration.GetSection("Jwt:TokenKey").Value!));
 
@@ -219,6 +224,20 @@ namespace test1.Controllers
             _customerRepository.Save();
 
             return Ok(existingCustomer);
+        }
+        [HttpPatch("AddRoleToCustomer"), Authorize]
+        public ActionResult<Customer> AddMovieToGenre([FromBody] AddRoleToCustomerDto model)
+        {
+            Customer customer = _customerRepository.GetCustomerByEmail(model.CustomerEmail);
+
+            if (! _customerRepository.CustomerExistsByEmail(customer.Email))
+            {
+                ModelState.AddModelError("", "The customer does not exist");
+                return StatusCode(422, ModelState);
+            }
+            List<Role> roles = _customerRepository.AddRoleToCustomer(customer, model);
+
+            return Ok(roles);
         }
         /*[HttpPatch("EditCustomer"), Authorize]
         public ActionResult EditCustomer(int id, JsonPatchDocument<Customer> patchDoc )
