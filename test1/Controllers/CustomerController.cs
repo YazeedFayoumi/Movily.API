@@ -12,6 +12,7 @@ namespace test1.Controllers
             return View();
         }
         // render view
+        //somethn
         [HttpGet]
         public ViewResult Create()
         {
