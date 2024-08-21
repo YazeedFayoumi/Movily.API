@@ -289,24 +289,81 @@ namespace test1.Repositories
 
         public List<Role> AddRoleToCustomer(Customer customer, AddRoleToCustomerDto model)
         {
-            if (customer == null)
-            {
-                throw new Exception("Customer not found");
-            }
+            /* if (customer == null)
+             {
+                 throw new Exception("Customer not found");
+             }
+             var roles = _context.Role.Where(r => model.Roles.Contains(r.Name)).ToList();
+
+             foreach (var role in roles)
+             {
+                 if (!customer.Roles.Contains(role))
+                 {
+                     customer.Roles.Add(role);
+                     _context.CustomerRoles.Add(new CustomerRole
+                     {
+                         CustomerId = customer.Id,
+                         RoleId = role.Id
+                     });
+                 }
+             }
+
+             Save();
+             List<Role> cusotmerRoles =  _context.CustomerRoles
+         .Where(cr => cr.CustomerId == customer.Id)
+         .Select(cr => cr.Role)
+         .ToList(); //customer.Roles.ToList();   
+             return cusotmerRoles;*/
             var roles = _context.Role.Where(r => model.Roles.Contains(r.Name)).ToList();
+
+            // Retrieve existing roles of the customer
+            
 
             foreach (var role in roles)
             {
-                if (!customer.Roles.Contains(role))
-                {
-                    customer.Roles.Add(role);
-
-                }
+                // Check if the customer already has this role
+               // customer.Roles.Add(role);
+                
+                    // Add the new role to the customer's roles
+                    _context.CustomerRoles.Add(new CustomerRole
+                    {
+                        CustomerId = customer.Id,
+                        RoleId = role.Id
+                    });
+                
             }
-            
+
+            // Save changes to the database
             Save();
-            List<Role> cusotmerRoles = customer.Roles.ToList();   
-            return cusotmerRoles;
+
+            // Return the updated list of roles for the customer
+            var updatedRoles = _context.CustomerRoles
+                .Where(cr => cr.CustomerId == customer.Id)
+                .Select(cr => cr.Role)
+                .ToList();
+
+            return updatedRoles;
+
+        }
+           
+
+     
+
+        public List<Role> GetRoles(List<int> roleIds)
+        {
+            return _context.Role
+           .Where(r => roleIds.Contains(r.Id))
+           .ToList();
+        }
+
+        public List<CustomerRole> GetCustomerRoleById(int id)
+        {
+            Customer customer = GetCustomerById(id);
+
+            List<CustomerRole> customerRole = _context.CustomerRoles.Where(c => c.CustomerId == customer.Id).ToList();
+            
+            //_context.CustomerRoles.FirstOrDefault()
+            return customerRole;
         }
     }
 }

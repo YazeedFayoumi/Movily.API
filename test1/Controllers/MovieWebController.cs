@@ -23,7 +23,7 @@ namespace test1.Controllers
             _mapper = mapper;
             _customerRepository = customerRepository;
         }
-
+        [AuthorizeRole(Roles = "Admin")]
         [HttpGet("{GetString}")]
         public string GetString()
         {
@@ -49,7 +49,7 @@ namespace test1.Controllers
 
             return Ok(addedMovie);
         }
-
+        [AuthorizeRole(Roles = "Support")]
         [HttpGet("AllMovies")]
         public IActionResult GetAllMovies()
         {

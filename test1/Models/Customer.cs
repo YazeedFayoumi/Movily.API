@@ -25,7 +25,10 @@ namespace test1.Models
         public string Password { get; set; }
 
         public virtual ICollection<Movie> Movie { get; set; } = new List<Movie>();
-        public ICollection<Role> Roles { get; set; }
+        //public ICollection<Role> Roles { get; set; }
+        public ICollection<CustomerRole> CustomerRoles { get; set; } = new List<CustomerRole>();
+
+        public ICollection<Role> Roles => CustomerRoles.Select(cr => cr.Role).ToList();
 
 
         public MembershipType MembershipType { get; set; }

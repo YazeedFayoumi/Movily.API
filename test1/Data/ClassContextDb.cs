@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using test1.Configration;
 using test1.Models;
 
 
@@ -12,7 +13,10 @@ namespace test1.Data
         public DbSet<Customer> Customer { get; set; }
         public DbSet<Movie> Movie { get; set; }
         public DbSet<Genre> Genre { get; set; }
-        public DbSet<Role> Role { get; set; }   
+        public DbSet<Role> Role { get; set; }
+        public DbSet<CustomerRole> CustomerRoles { get; set; }
+
+
         public DbSet<MembershipType> MembershipType { get; set; }
         
 
@@ -26,12 +30,29 @@ namespace test1.Data
              .WithMany(m => m.Customer)
              .UsingEntity(j => j.ToTable("CustomerMovie"));
 
-            modelBuilder.Entity<Role>().HasData(
-   new Role { Id = 1, Name = "SuperAdmin" },
-   new Role { Id = 2, Name = "Admin" },
-   new Role { Id = 3, Name = "User" },
-   new Role { Id = 4, Name = "Support" });
+             modelBuilder.Entity<Role>().HasData(
+    new Role { Id = 1, Name = "SuperAdmin" },
+    new Role { Id = 2, Name = "Admin" },
+    new Role { Id = 3, Name = "User" },
+    new Role { Id = 4, Name = "Support" });
 
+            /*      modelBuilder.Entity<CustomerRole>()
+               .HasKey(cm => new { cm.CustomerId, cm.RoleId });
+
+
+                  modelBuilder.Entity<CustomerRole>()
+                      .HasOne(cm => cm.Customer)
+                      .WithMany(c => c.CustomerRoles)
+                      .HasForeignKey(cm => cm.CustomerId);
+
+
+                  modelBuilder.Entity<CustomerRole>()
+                      .HasOne(cm => cm.Role)
+                      .WithMany(m => m.CustomerRoles)
+                      .HasForeignKey(cm => cm.RoleId);
+                  modelBuilder.Entity<CustomerRole>()
+          .ToTable("CustomerRole");*/
+            modelBuilder.ApplyConfiguration(new CustomerRoleConfig());
         }
 
     }

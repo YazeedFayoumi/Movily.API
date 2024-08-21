@@ -69,7 +69,7 @@ namespace test1.Controllers
             }
             return Ok(customer);
         }
-        [HttpPost("CreateCustomer")]
+        [HttpPost("Register")] 
         public ActionResult<Customer> CreateCustomer([FromBody] CustomerDtoSignIn customer)
         {
             if (customer == null || !ModelState.IsValid)
@@ -91,7 +91,7 @@ namespace test1.Controllers
 
             return Ok(createdCustomer);
         }
-        [HttpPost("LoginCustomer")]
+        [HttpPost("Login")]
         public ActionResult LoginCustomer([FromBody] CustomerDto loginCustomer)
         {
             Customer customer = _customerRepository.GetCustomerByEmail(loginCustomer.Email);
@@ -122,11 +122,15 @@ namespace test1.Controllers
         } 
         private string CreateToken(Customer customer)
         {
+            List<CustomerRole> customerRole = _customerRepository.GetCustomerRoleById(customer.Id);
+
             List<Claim> claims = new List<Claim> {
                 new Claim(ClaimTypes.Email, customer.Email),
                 //new Claim(ClaimTypes.Role, customer.Roles)
                 };
-            foreach (var role in customer.Roles)
+            List<int> roleIds = customerRole.Select(cr => cr.RoleId).ToList();
+            List<Role> roles = _customerRepository.GetRoles(roleIds);
+            foreach (var role in roles )
             {
                 claims.Add(new Claim(ClaimTypes.Role, role.Name)); 
             }
@@ -193,9 +197,6 @@ namespace test1.Controllers
             _customerRepository.DeleteCustomer(customer);
             _customerRepository.Save();
             return NoContent();
-
-            
-
         }
         [HttpPut("UpdateCustomer"), Authorize]
         public ActionResult UpdateCustomer([FromBody] Customer updatedCustomer)
@@ -225,8 +226,9 @@ namespace test1.Controllers
 
             return Ok(existingCustomer);
         }
-        [HttpPatch("AddRoleToCustomer"), Authorize]
-        public ActionResult<Customer> AddMovieToGenre([FromBody] AddRoleToCustomerDto model)
+
+        [HttpPatch("AddRole"), Authorize]
+        public ActionResult<Customer> AddRoleToCustomer([FromBody] AddRoleToCustomerDto model)
         {
             Customer customer = _customerRepository.GetCustomerByEmail(model.CustomerEmail);
 
@@ -236,8 +238,13 @@ namespace test1.Controllers
                 return StatusCode(422, ModelState);
             }
             List<Role> roles = _customerRepository.AddRoleToCustomer(customer, model);
+            List<RoleDto> roleDtos = roles.Select(role => new RoleDto
+            {
+                RoleName = role.Name
+            }).ToList();
 
-            return Ok(roles);
+
+            return Ok(roleDtos);
         }
         /*[HttpPatch("EditCustomer"), Authorize]
         public ActionResult EditCustomer(int id, JsonPatchDocument<Customer> patchDoc )

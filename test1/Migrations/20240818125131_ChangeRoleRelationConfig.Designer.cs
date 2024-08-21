@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using test1.Data;
 
@@ -11,9 +12,11 @@ using test1.Data;
 namespace test1.Migrations
 {
     [DbContext(typeof(ClassContextDb))]
-    partial class ClassContextDbModelSnapshot : ModelSnapshot
+    [Migration("20240818125131_ChangeRoleRelationConfig")]
+    partial class ChangeRoleRelationConfig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -203,28 +206,6 @@ namespace test1.Migrations
                     b.HasIndex("CustomerId");
 
                     b.ToTable("Role");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "SuperAdmin"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Admin"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "User"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Support"
-                        });
                 });
 
             modelBuilder.Entity("CustomerMovie", b =>
