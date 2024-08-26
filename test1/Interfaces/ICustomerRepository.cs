@@ -16,7 +16,7 @@ namespace test1.Interfaces
         bool CustomerExistsByEmail(string email);
         Customer CustomerExistsByName(string name);
 
-        Customer CreateCustomer(CustomerDtoSignIn customer);
+        Customer CreateCustomer(CustomerDtoSignUp customer);
         bool Save();   
 
         Customer LoginCustomer(Customer customer);

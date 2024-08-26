@@ -9,6 +9,9 @@ namespace test1.Mapping
         public MappingProfile()
         {
             CreateMap<Customer, CustomerDto>();
+            CreateMap<Customer,CustomerDtoSignUp>();
+            CreateMap<Customer, CustomerReturn>();
+
             CreateMap<Movie, MovieDto>();
             CreateMap<Genre, GenreDto>();
             CreateMap<CustomerRole, CustomerRoleDto>();

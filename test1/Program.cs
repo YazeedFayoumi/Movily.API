@@ -10,6 +10,7 @@ using System.Text;
 using AutoMapper;
 using test1.Mapping;
 using Microsoft.Extensions.DependencyInjection;
+using Nest;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -65,7 +66,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<ICustomerRepository, Repository>();
 builder.Services.AddScoped<IMovieRepository, Repository>();
 builder.Services.AddScoped<IGenreRepository, Repository>();
-
+builder.Services.AddScoped(typeof(IRepo<>), typeof(GenericRepository<>));
 
 
 builder.Services.AddDbContext<ClassContextDb>(options =>
