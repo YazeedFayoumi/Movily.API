@@ -6,6 +6,7 @@ using System.Security.Claims;
 using test1.Dto;
 using test1.Interfaces;
 using test1.Models;
+using test1.Repositories;
 
 namespace test1.Controllers
 {
@@ -13,15 +14,37 @@ namespace test1.Controllers
     [ApiController]
     public class GenreWebController : ControllerBase
     {
-        public IGenreRepository _genreRepository;
+        private readonly IRepo<Genre> _repository;
         public IMovieRepository _movieRepository;
         public IMapper _mapper;
 
-        public GenreWebController(IMovieRepository movieRepository, IMapper mapper, IGenreRepository genre)
+        public GenreWebController(IRepo<Genre> repository, IMapper mapper)
         {
-            _movieRepository = movieRepository;
+           // _movieRepository = movieRepository;
             _mapper = mapper;
-            _genreRepository = genre;
+            _repository = repository;
+        }
+        [HttpGet("AllGenres")]
+        public IActionResult GetGenres()
+        {
+            var genres = _repository.GetAll();
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var genreDtos = _mapper.Map<List<GenreDto>>(genres);
+            return Ok(genreDtos);
+        }
+        [HttpGet("Genre")]
+        public IActionResult GetGenre(int id) 
+        { 
+            Genre genre = _repository.Get(id);
+            if (!ModelState.IsValid || genre == null )
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok(genre);
         }
         [HttpPost("AddGenre"), Authorize]
         public ActionResult<Genre> AddGenre([FromBody] GenreDto genre)
@@ -31,16 +54,23 @@ namespace test1.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (_genreRepository.CheckGenreByName(genre.GenreName))
+            if (_repository.Exists(g => g.GenreName == genre.GenreName))
             {
                 ModelState.AddModelError("", "This genre was already added.");
                 return StatusCode(422, ModelState);
             }
-            
-           
-            Genre addedGenre = _genreRepository.AddGenre(genre);
+
+            Genre newGenre = new Genre
+
+            {
+                GenreName = genre.GenreName,
+                Description = genre.Description,
+
+            };
+            Genre addedGenre = _repository.Create(newGenre);
             return Ok(addedGenre);
         }
+        /*
         [AuthorizeRole(Roles ="User")]
         [HttpPatch("AddMovieToGenre"), Authorize]
         public ActionResult<Genre> AddMovieToGenre([FromBody] MovieToGenreDto model)
@@ -61,19 +91,7 @@ namespace test1.Controllers
             Genre newGenre = _genreRepository.AddMovieToGenre(movie, genre);
             return Ok(newGenre);
         }
-        [HttpGet("GetAllGenres")]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Customer>))]
-        public IActionResult GetCustomers()
-        {
-            var genres = _genreRepository.GetAllGenres();
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var genreDtos = _mapper.Map<List<GenreDto>>(genres);
-            return Ok(genreDtos);
-        }
+        
         [HttpGet("GetGenreMovies/{genreName}")]
         public IActionResult GetGenreMovies(string genreName)
         {
@@ -104,6 +122,6 @@ namespace test1.Controllers
             bool genreDeleted = _genreRepository.DeleteGenreByName(genre);
             return Ok(genreDeleted);
 
-        }
+        }*/
     }
 }

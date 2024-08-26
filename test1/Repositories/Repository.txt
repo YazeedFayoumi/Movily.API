@@ -38,7 +38,7 @@ namespace test1.Repositories
             return newMovie;
         }
 
-        public Customer CreateCustomer(CustomerDtoSignIn customer)
+        public Customer CreateCustomer(CustomerDtoSignUp customer)
         {
 
             Customer newCustomer = new Customer

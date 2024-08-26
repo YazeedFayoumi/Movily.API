@@ -13,15 +13,16 @@ namespace test1.Configration
             // Configure the relationship between Customer and CustomerRole
             builder.HasOne(cr => cr.Customer)
                    .WithMany(c => c.CustomerRoles)
-                   .HasForeignKey(cr => cr.CustomerId);
-
+                   .HasForeignKey(cr => cr.CustomerId)
+                   .OnDelete(DeleteBehavior.Cascade);
             // Configure the relationship between Role and CustomerRole
             builder.HasOne(cr => cr.Role)
                    .WithMany(r => r.CustomerRoles)
-                   .HasForeignKey(cr => cr.RoleId);
+                   .HasForeignKey(cr => cr.RoleId)
+                   .OnDelete(DeleteBehavior.Cascade); 
 
             // Map the entity to an existing table if needed
-            builder.ToTable("CustomerRoles"); // Ensure this matches the table name
+            builder.ToTable("CustomerRoles"); 
         }
     }
 }
