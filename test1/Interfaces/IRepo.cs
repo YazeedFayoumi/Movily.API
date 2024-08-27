@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+using System.Linq.Expressions;
 
 namespace test1.Interfaces
 {
@@ -9,13 +10,21 @@ namespace test1.Interfaces
         bool Exists(Func<TEntity, bool> predicate);
         TEntity Create(TEntity entity);
         TEntity GetByCondition(Func<TEntity, bool> predicate);
-        List<TEntity> GetListByCondition<TEntity>(Func<TEntity, bool> predicate) where TEntity : class;
+        List<TEntity> GetListByCondition(Func<TEntity, bool> predicate);
         //List<TEntity> GetListByCondition(Func<TEntity, bool> predicate);
         //List<TEntity> GetListByCondition(int id);
         bool Save();  
         public void Update(TEntity entity);
         public void Delete(TEntity entity);
-        public void Add<TEntity>(TEntity entity) where TEntity :class;
-       
+        public void Add(TEntity entity) ;
+        public TEntity GetByCondition(
+    Expression<Func<TEntity, bool>> predicate,
+    Expression<Func<TEntity, object>> include = null);
+
+        public List<TEntity> GetListByCondition(
+            Expression<Func<TEntity, bool>> predicate,
+            Expression<Func<TEntity, object>> include = null);
+
+
     }
 }

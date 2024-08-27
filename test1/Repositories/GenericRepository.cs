@@ -1,7 +1,9 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using Nest;
+using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection.Metadata.Ecma335;
 using test1.Data;
 using test1.Interfaces;
@@ -49,14 +51,14 @@ namespace test1.Repositories
             return saved >0 ? true : false;
         }
 
-        public TEntity GetByCondition(Func<TEntity, bool> predicate)
+        /*public TEntity GetByCondition(Func<TEntity, bool> predicate) where TEntity : class
         {
-            return _dbSet.FirstOrDefault(predicate);
-        }
+           
+        }*/
 
-        public List<TEntity> GetListByCondition<TEntity>(Func<TEntity, bool> predicate) where TEntity : class
+        public List<TEntity> GetListByCondition(Func<TEntity, bool> predicate) 
         {
-            return _context.Set<TEntity>().Where(predicate).ToList();
+            return _dbSet.Where(predicate).ToList();
         }
 
         /*public List<TEntity> GetListByCondition(Func<TEntity, bool> predicate)
@@ -90,9 +92,9 @@ namespace test1.Repositories
              _dbSet.Add(entity);
              Save();
          }*/
-        public void Add<TEntity>(TEntity entity) where TEntity : class
+        public void Add(TEntity entity)
         {
-            _context.Set<TEntity>().Add(entity);
+            _dbSet.Add(entity);
             Save();
         }
 
@@ -109,7 +111,44 @@ namespace test1.Repositories
             Save();
         }
 
-       
+        public TEntity GetByCondition(Func<TEntity, bool> predicate) 
+        {
+            
+            return _context.Set<TEntity>().FirstOrDefault(predicate);
+           
+        }
+
+        public TEntity GetByCondition(
+         Expression<Func<TEntity, bool>> predicate,
+        Expression<Func<TEntity, object>> include = null) 
+        {
+            IQueryable<TEntity> query = _context.Set<TEntity>();
+
+            
+            if (include != null)
+            {
+                query = query.Include(include);
+            }
+
+            
+            return query.FirstOrDefault(predicate);
+        }
+
+        public List<TEntity> GetListByCondition(
+            Expression<Func<TEntity, bool>> predicate,
+            Expression<Func<TEntity, object>> include = null) 
+        {
+            IQueryable<TEntity> query = _context.Set<TEntity>();
+
+            
+            if (include != null)
+            {
+                query = query.Include(include);
+            }
+
+            
+            return query.Where(predicate).ToList();
+        }
     }
 }
 
