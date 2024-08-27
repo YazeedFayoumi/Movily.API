@@ -25,16 +25,20 @@ namespace test1.Controllers
     {
         //IRepository<Customer> _repository;
         private readonly IRepo<Customer> _repository;
+        private readonly IRepo<Role> _roleRepository;
+        private readonly IRepo<CustomerRole> _customerRoleRepo;
         private readonly IConfiguration _configuration;
         public IMapper _mapper;
 
         //public static Customer customerObj = new Customer();
 
-        public CustomerWebController(IRepo<Customer> repository, IConfiguration configuration, IMapper mapper)
+        public CustomerWebController(IRepo<Customer> repository, IConfiguration configuration, IMapper mapper, IRepo<Role> roleRepo, IRepo<CustomerRole> crRole)
         {
             _repository = repository;
             _configuration = configuration;
             _mapper = mapper;
+            _roleRepository = roleRepo;
+            _customerRoleRepo = crRole;
         }
 
         [HttpGet("{GetString}")]
@@ -135,11 +139,11 @@ namespace test1.Controllers
         {
             List<CustomerRole> GetCustomerRoleById(Customer customer)
             {
-                return _repository.GetListByCondition<CustomerRole>(c => c.CustomerId == customer.Id);
+                return _customerRoleRepo.GetListByCondition(c => c.CustomerId == customer.Id);
             }
             List<Role> GetRoles(List<int> roleIds)
             {
-                return _repository.GetListByCondition<Role>(r => roleIds.Contains(r.Id));
+                return _roleRepository.GetListByCondition(r => roleIds.Contains(r.Id));
             }
 
             List<CustomerRole> customerRole = GetCustomerRoleById(customer);
@@ -215,7 +219,7 @@ namespace test1.Controllers
                 return StatusCode(422, ModelState);
             }
 
-            List<Role> roles = _repository.GetListByCondition<Role>(r => model.Roles.Contains(r.Name));
+            List<Role> roles = _roleRepository.GetListByCondition(r => model.Roles.Contains(r.Name));
             foreach (var role in roles)
             {
 
@@ -224,7 +228,7 @@ namespace test1.Controllers
                     CustomerId = customer.Id,
                     RoleId = role.Id
                 };
-                _repository.Add(customerRole); 
+                _customerRoleRepo.Add(customerRole); 
 
             }
 
