@@ -12,8 +12,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using test1.Dto;
-using test1.Interfaces;
 using test1.Models;
+using test1.Services;
+
+using test1.Services.CustomerServiceF;
 
 
 namespace test1.Controllers
@@ -23,22 +25,24 @@ namespace test1.Controllers
 
     public class CustomerWebController : ControllerBase
     {
-        //IRepository<Customer> _repository;
-        private readonly IRepo<Customer> _repository;
+        
+      /*private readonly IRepo<Customer> _repository;
         private readonly IRepo<Role> _roleRepository;
-        private readonly IRepo<CustomerRole> _customerRoleRepo;
+        private readonly IRepo<CustomerRole> _customerRoleRepo;*/
         private readonly IConfiguration _configuration;
         public IMapper _mapper;
+        private readonly ICustomerService _customerService;
 
         //public static Customer customerObj = new Customer();
 
-        public CustomerWebController(IRepo<Customer> repository, IConfiguration configuration, IMapper mapper, IRepo<Role> roleRepo, IRepo<CustomerRole> crRole)
+        public CustomerWebController(IConfiguration configuration, IMapper mapper, ICustomerService customerService)
         {
-            _repository = repository;
+           // _repository = repository;
             _configuration = configuration;
             _mapper = mapper;
-            _roleRepository = roleRepo;
-            _customerRoleRepo = crRole;
+            _customerService = customerService;
+            /*_roleRepository = roleRepo;
+            _customerRoleRepo = crRole;*/
         }
 
         [HttpGet("{GetString}")]
@@ -50,21 +54,21 @@ namespace test1.Controllers
         //[AuthorizeRole(Roles ="Admin")]
         [HttpGet("GetCustomers")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Customer>))]
-        public IActionResult GetCustomers()
+        public ActionResult GetCustomers()
         {
-            var customers = _repository.GetAll();
+            var customersDto = _customerService.GetCustomers();
 
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || customersDto == null)
             {
                 return BadRequest(ModelState);
             }
-            var customerDtos = _mapper.Map<List<CustomerReturn>>(customers);
-            return Ok(customerDtos);
+            
+            return Ok(customersDto);
         }
         [HttpGet("GetCustomerById/{id}")]
-        public IActionResult GetCustomerById(int id)
+        public ActionResult GetCustomerById(int id)
         {
-            if (_repository.Get(id)==null)
+           /* if (_repository.Get(id)==null)
             {
                 return NotFound();
             }
@@ -73,13 +77,15 @@ namespace test1.Controllers
             {
                 return BadRequest(ModelState);
             }
-            return Ok(customer);
+            return Ok(customer);*/
+           var customer = _customerService.GetCustomerById(id);
+           return Ok(customer);
         }
 
         [HttpPost("Register")]
         public ActionResult<Customer> CreateCustomer([FromBody] CustomerDtoSignUp customer)
         {
-            if (customer == null || !ModelState.IsValid)
+            /*if (customer == null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -104,13 +110,32 @@ namespace test1.Controllers
             };
             var createdCustomer = _repository.Create(newCustomer);
 
-            return Ok(createdCustomer);
+            return Ok(createdCustomer);*/
+            if (customer == null)
+            {
+                return BadRequest();
+            }
+            if(_customerService.CheckCustomer(customer.Email))
+            {
+                ModelState.AddModelError("", "Customer already exists");
+                return StatusCode(422, ModelState);
+            }
+            try
+            {
+                var createdCustomer = _customerService.CreateCustomer(customer);
+                return Ok(createdCustomer);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+
         }
 
         [HttpPost("Login")]
         public ActionResult LoginCustomer([FromBody] CustomerDto loginCustomer)
         {
-            Customer customer = _repository.GetByCondition(e => e.Email == loginCustomer.Email);
+           /* Customer customer = _repository.GetByCondition(e => e.Email == loginCustomer.Email);
 
             if (customer == null)
             {
@@ -171,7 +196,9 @@ namespace test1.Controllers
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
-            return jwt;
+            return jwt;*/
+           var response = _customerService.LoginCustomer(loginCustomer);
+            return Ok(response);
         }
 
 
@@ -189,8 +216,8 @@ namespace test1.Controllers
             var email = emailClaim.Value;
             var roles = roleClaim.Select(r => r.Value).ToList();
 
-            var customer = _repository.GetByCondition(e => e.Email == email);
-            if (customer == null)
+            var profileResponse = _customerService.GetProfile(email, roles);
+           /* if (customer == null)
             {
                 return NotFound("Customer profile not found.");
             }
@@ -204,14 +231,14 @@ namespace test1.Controllers
                 customer.CustomerRoles.Count,
                 Roles = roles
 
-            };
+            };*/
 
             return Ok(profileResponse);
         }
         [HttpPatch("AddRole")]
         public ActionResult<Customer> AddRoleToCustomer([FromBody] AddRoleToCustomerDto model)
         {
-            var customer = _repository.GetByCondition(e => e.Email == model.CustomerEmail);
+            /*var customer = _repository.GetByCondition(e => e.Email == model.CustomerEmail);
 
             if (!_repository.Exists(c => c.Email == model.CustomerEmail))
             {
@@ -239,14 +266,23 @@ namespace test1.Controllers
             }).ToList();
 
             _repository.Update(customer);
-            return Ok(roleDtos);
-
+            return Ok(roleDtos);*/
+            try
+            {
+                var rolesDto  = _customerService.AddRoleToCustomer(model);
+                return Ok(rolesDto);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+           
         }
 
     [HttpDelete("DeleteCustomer/{id}")]
     public IActionResult DeleteCustomer([FromRoute] int id)
     {
-        if (!_repository.Exists(i => i.Id == id))
+       /* if (!_repository.Exists(i => i.Id == id))
         {
             return NotFound("Customer not found.");
         }
@@ -259,35 +295,40 @@ namespace test1.Controllers
 
         _repository.Delete(customer);
         _repository.Save();
-        return NoContent();
+        return NoContent();*/
+       _customerService.DeleteCustomer(id);
+        return Ok();
+
     }
     [HttpPut("UpdateCustomer/{id}")]
     public ActionResult UpdateCustomer(int id, UpdateCustomerDto updatedCustomer)
     {
-            if (!_repository.Exists(i => i.Id == id))
+            /*if (!_repository.Exists(i => i.Id == id))
             {
                 return NotFound("Customer not found.");
             }
 
-        var existingCustomer = _repository.Get(id);
-        if (existingCustomer == null)
-        {
-            return NotFound("Customer not found.");
-        }
+            var existingCustomer = _repository.Get(id);
+            if (existingCustomer == null)
+            {
+                return NotFound("Customer not found.");
+            }
 
-        if (!string.IsNullOrEmpty(updatedCustomer.Password))
-        {
-            existingCustomer.Password = BCrypt.Net.BCrypt.HashPassword(updatedCustomer.Password);
-        }
+            if (!string.IsNullOrEmpty(updatedCustomer.Password))
+            {
+                existingCustomer.Password = BCrypt.Net.BCrypt.HashPassword(updatedCustomer.Password);
+            }
 
-        existingCustomer.Name = updatedCustomer.Name;
-        existingCustomer.Email = updatedCustomer.Email;
-        existingCustomer.MembershipTypeId = updatedCustomer.MembershipTypeId;
+            existingCustomer.Name = updatedCustomer.Name;
+            existingCustomer.Email = updatedCustomer.Email;
+            existingCustomer.MembershipTypeId = updatedCustomer.MembershipTypeId;
 
-        _repository.Update(existingCustomer);
-        _repository.Save();
+            _repository.Update(existingCustomer);
+            _repository.Save();
 
-        return Ok(existingCustomer);
+            return Ok(existingCustomer);*/
+            var customer = _customerService.UpdateCustomer(id, updatedCustomer);
+            return Ok(customer);
     }
 
         /*[HttpPatch("EditCustomer"), Authorize]

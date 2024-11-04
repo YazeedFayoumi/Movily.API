@@ -12,6 +12,11 @@ using test1.Mapping;
 using Microsoft.Extensions.DependencyInjection;
 using Nest;
 
+using test1.Services.CustomerServiceF;
+using test1.Services.MovieServiceF;
+using test1.Services.GenreServiceF;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,9 +68,10 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddScoped<ICustomerRepository, Repository>();
-builder.Services.AddScoped<IMovieRepository, Repository>();
-builder.Services.AddScoped<IGenreRepository, Repository>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IMovieService, MovieService>();
+
+builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped(typeof(IRepo<>), typeof(GenericRepository<>));
 
 
