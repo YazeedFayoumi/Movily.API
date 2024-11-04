@@ -9,6 +9,7 @@ using test1.Dto;
 using test1.Interfaces;
 using test1.Models;
 using test1.Repositories;
+using test1.Services.GenreServiceF;
 
 namespace test1.Controllers
 {
@@ -16,32 +17,42 @@ namespace test1.Controllers
     [ApiController]
     public class GenreWebController : ControllerBase
     {
-        private readonly IRepo<Genre> _repository;
+        /*private readonly IRepo<Genre> _repository;
         private readonly IRepo<Movie> _movieRepository;
-        public IMapper _mapper;
+        public IMapper _mapper;*/
+        private readonly IGenreService _genreService;
 
-        public GenreWebController(IRepo<Genre> repository, IMapper mapper, IRepo<Movie> movieRepository)
+        public GenreWebController(IGenreService genreService)
         {
-            _mapper = mapper;
+          /*  _mapper = mapper;
             _repository = repository;
-            _movieRepository = movieRepository;
+            _movieRepository = movieRepository;*/
+          _genreService = genreService;
         }
         [HttpGet("AllGenres")]
         public IActionResult GetGenres()
         {
-            var genres = _repository.GetAll();
+           /* var genres = _repository.GetAll();
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             var genreDtos = _mapper.Map<List<GenreDto>>(genres);
-            return Ok(genreDtos);
+            return Ok(genreDtos);*/
+           var genres = _genreService.GetGenres();
+            return Ok(genres);
         }
         [HttpGet("Genre")]
         public IActionResult GetGenre(int id)
         {
-            Genre genre = _repository.Get(id);
+            /*Genre genre = _repository.Get(id);
+            if (!ModelState.IsValid || genre == null)
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok(genre);*/
+            var genre = _genreService.GetGenreById(id);
             if (!ModelState.IsValid || genre == null)
             {
                 return BadRequest(ModelState);
@@ -51,25 +62,27 @@ namespace test1.Controllers
         [HttpPost("AddGenre"), Authorize]
         public ActionResult<Genre> AddGenre([FromBody] GenreDto genre)
         {
-            if (genre == null || !ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            /* if (genre == null || !ModelState.IsValid)
+             {
+                 return BadRequest(ModelState);
+             }
 
-            if (_repository.Exists(g => g.GenreName == genre.GenreName))
-            {
-                ModelState.AddModelError("", "This genre was already added.");
-                return StatusCode(422, ModelState);
-            }
+             if (_repository.Exists(g => g.GenreName == genre.GenreName))
+             {
+                 ModelState.AddModelError("", "This genre was already added.");
+                 return StatusCode(422, ModelState);
+             }
 
-            Genre newGenre = new Genre
+             Genre newGenre = new Genre
 
-            {
-                GenreName = genre.GenreName,
-                Description = genre.Description,
+             {
+                 GenreName = genre.GenreName,
+                 Description = genre.Description,
 
-            };
-            Genre addedGenre = _repository.Create(newGenre);
+             };
+             Genre addedGenre = _repository.Create(newGenre);
+             return Ok(addedGenre);*/
+            Genre addedGenre = _genreService.CreateGenre(genre);
             return Ok(addedGenre);
         }
 
@@ -97,7 +110,7 @@ namespace test1.Controllers
         [HttpPatch("AddMovieToGenre")]
         public ActionResult<Genre> AddMovieToGenre([FromBody] MovieToGenreDto model)
         {
-            if (model.Title == null || model.GenreName == null || !ModelState.IsValid)
+           /* if (model.Title == null || model.GenreName == null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -112,12 +125,12 @@ namespace test1.Controllers
             Genre genre = _repository.GetByCondition(n => n.GenreName == model.GenreName);
             Movie movie = _movieRepository.GetByCondition(m => m.Title == model.Title);
 
-           /* if (movie == null)
+           *//* if (movie == null)
             {
                 ModelState.AddModelError("", "The movie does not exist");
                 return StatusCode(422, ModelState);
             }
-*/
+*//*
             if (genre.Movie == null)
             {
                 genre.Movie = new List<Movie>();
@@ -127,7 +140,9 @@ namespace test1.Controllers
             _repository.Update(genre);
             _repository.Save();
 
-            return Ok(genre);
+            return Ok(genre);*/
+            Genre newGenre = _genreService.AddMovieToGenre(model);
+            return Ok(newGenre);
         }
 
         /* [HttpGet("GetGenreMovies/{genreName}")]
@@ -150,7 +165,7 @@ namespace test1.Controllers
         [HttpGet("GetGenreMovies/{genreName}")]
         public IActionResult GetGenreMovies(string genreName)
         {
-            var genre = _repository.GetByCondition(
+            /*var genre = _repository.GetByCondition(
                 g => g.GenreName == genreName,
                 g => g.Movie
             );
@@ -162,7 +177,11 @@ namespace test1.Controllers
 
             var genreMoviesDtos = _mapper.Map<List<MovieDto>>(genre.Movie.ToList());
 
+            return Ok(genreMoviesDtos);*/
+            var genreMoviesDtos = _genreService.GetMoviesByGenre(genreName);
+
             return Ok(genreMoviesDtos);
+
         }
 
 
@@ -170,7 +189,7 @@ namespace test1.Controllers
         [HttpDelete("DeleteGenre/{genreName}"), Authorize]
         public IActionResult DeleteGenre([FromRoute] string genreName)
         {
-            if (!_repository.Exists(g => g.GenreName == genreName))
+         /*   if (!_repository.Exists(g => g.GenreName == genreName))
             {
                 return NotFound("Genre not found.");
             }
@@ -189,8 +208,9 @@ namespace test1.Controllers
             {
                 throw new Exception(ex.Message);
             }
+            return Ok();*/
+            _genreService.DeleteGenre(genreName);
             return Ok();
-
         }
     }
 }
