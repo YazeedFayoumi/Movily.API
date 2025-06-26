@@ -51,7 +51,6 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "bearer"
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement {
-    
         {
             new OpenApiSecurityScheme{
             
@@ -62,9 +61,7 @@ builder.Services.AddSwaggerGen(c =>
                 }
             },
             new string[]{}
-
         }
-    
     });
 });
 builder.Services.AddEndpointsApiExplorer();
@@ -89,7 +86,12 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    options.RoutePrefix= string.Empty;
+    options.DocumentTitle = "My Swagger";
+});
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -103,11 +105,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.UseSwagger();
-app.UseSwaggerUI(options =>
-{
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-    options.RoutePrefix= string.Empty;
-    options.DocumentTitle = "My Swagger";
-});
+
 
 app.Run();

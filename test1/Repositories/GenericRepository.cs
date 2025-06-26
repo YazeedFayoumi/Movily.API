@@ -61,37 +61,6 @@ namespace test1.Repositories
             return _dbSet.Where(predicate).ToList();
         }
 
-        /*public List<TEntity> GetListByCondition(Func<TEntity, bool> predicate)
-        {
-            //return _dbSet.Where(predicate).ToList();
-            return _dbSet.AsEnumerable().Where(predicate).ToList();
-        }*/
-
-
-        /* public void Add(TEntity entity)
-         {
-             _dbSet.Add(entity);
-             Save();
-         }
-
-         public void Delete(TEntity entity)
-         {
-             _dbSet.Remove(entity);
-             Save();
-         }
-
-         public void Update(TEntity entity)
-         {
-             _dbSet.Attach(entity);
-             _context.Entry(entity).State = EntityState.Modified;
-             Save();
-         }*/
-
-        /* public void Add(TEntity entity) 
-         {
-             _dbSet.Add(entity);
-             Save();
-         }*/
         public void Add(TEntity entity)
         {
             _dbSet.Add(entity);

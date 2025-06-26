@@ -30,7 +30,7 @@ namespace test1.Models
 
         public ICollection<Role> Roles => CustomerRoles.Select(cr => cr.Role).ToList();
 
-
+        //Where(x=>x.CustomerId == Id).
         public MembershipType MembershipType { get; set; }
         public int MembershipTypeId { get; set; }
         

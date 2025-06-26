@@ -31,27 +31,11 @@ namespace test1.Data
              .UsingEntity(j => j.ToTable("CustomerMovie"));
 
              modelBuilder.Entity<Role>().HasData(
-    new Role { Id = 1, Name = "SuperAdmin" },
-    new Role { Id = 2, Name = "Admin" },
-    new Role { Id = 3, Name = "User" },
-    new Role { Id = 4, Name = "Support" });
+                new Role { Id = 1, Name = "SuperAdmin" },
+                new Role { Id = 2, Name = "Admin" },
+                new Role { Id = 3, Name = "User" },
+                new Role { Id = 4, Name = "Support" });
 
-            /*      modelBuilder.Entity<CustomerRole>()
-               .HasKey(cm => new { cm.CustomerId, cm.RoleId });
-
-
-                  modelBuilder.Entity<CustomerRole>()
-                      .HasOne(cm => cm.Customer)
-                      .WithMany(c => c.CustomerRoles)
-                      .HasForeignKey(cm => cm.CustomerId);
-
-
-                  modelBuilder.Entity<CustomerRole>()
-                      .HasOne(cm => cm.Role)
-                      .WithMany(m => m.CustomerRoles)
-                      .HasForeignKey(cm => cm.RoleId);
-                  modelBuilder.Entity<CustomerRole>()
-          .ToTable("CustomerRole");*/
             modelBuilder.ApplyConfiguration(new CustomerRoleConfig());
         }
 

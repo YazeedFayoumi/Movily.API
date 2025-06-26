@@ -12,5 +12,6 @@ namespace test1.Models
         public string Name { get; set; }
         //public ICollection<Customer> Customers { get; set; }
         public ICollection<CustomerRole> CustomerRoles { get; set; }
+        
     }
 }

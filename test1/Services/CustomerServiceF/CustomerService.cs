@@ -130,7 +130,6 @@ namespace test1.Services.CustomerServiceF
         {
             var customers = _repository.GetAll();
 
-            
             var customerDtos = _mapper.Map<List<CustomerReturn>>(customers);
             return(customerDtos);
         }
@@ -150,7 +149,8 @@ namespace test1.Services.CustomerServiceF
                 customer.Name,
                 customer.Email,
                 customer.MembershipTypeId,
-                customer.CustomerRoles.Count,
+                //wtf
+                customer.CustomerRoles.Count ,
                 Roles = roles
 
             };
