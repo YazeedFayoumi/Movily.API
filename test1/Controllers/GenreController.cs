@@ -15,12 +15,12 @@ namespace test1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GenreWebController : ControllerBase
+    public class GenreController : ControllerBase
     {
         
         private readonly IGenreService _genreService;
 
-        public GenreWebController(IGenreService genreService)
+        public GenreController(IGenreService genreService)
         {
           /*  _mapper = mapper;
             _repository = repository;

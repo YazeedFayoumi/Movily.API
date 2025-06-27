@@ -14,7 +14,7 @@ namespace test1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MovieWebController : ControllerBase
+    public class MovieController : ControllerBase
     {
         /*private readonly IRepo<Movie> _repository;
         private readonly IRepo<Genre> _genreRepository;
@@ -22,7 +22,7 @@ namespace test1.Controllers
         public IMapper _mapper;
         private readonly IMovieService _movieService;
 
-        public MovieWebController(IMapper mapper, IMovieService movieService)
+        public MovieController(IMapper mapper, IMovieService movieService)
         {
             _mapper = mapper;
             _movieService = movieService;
