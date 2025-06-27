@@ -51,6 +51,7 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "bearer"
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+    
         {
             new OpenApiSecurityScheme{
             
@@ -61,7 +62,9 @@ builder.Services.AddSwaggerGen(c =>
                 }
             },
             new string[]{}
+
         }
+    
     });
 });
 builder.Services.AddEndpointsApiExplorer();
